@@ -1,0 +1,41 @@
+pipeline{
+    agent any
+    tools{
+        maven 'mymaven'
+    }
+       // parameters are used to store data, these parameters can be then used 
+       // in the steps
+       // parameters have values which can be of type string, integer, boolean, list of values, secret, password
+       // parameters are defined at the top of the jenkinsfile
+       // syntax for parameters:
+       // datatype(name: 'name of parameter', defaultValue: 'default value', description: 'description of parameter')
+    parameters{
+       choice (name: 'environment', choices: ["","Dev", "QA"], description: 'choose the environment')
+    }
+    stages{
+        stage('Build on Dev'){
+                when{
+                    expression{
+                     params.environment == "Dev"
+                    }
+                }
+            steps{
+                git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+                sh 'mvn pmd:pmd'
+                sh 'mvn compile'
+            } 
+        }
+        stage('Build on QA'){   
+                when{
+                    expression{
+                     params.environment == "QA"
+                    }
+                }
+            steps{
+                git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+                sh 'mvn test'
+                echo "Test completed"
+            }    
+        }
+    }
+}
